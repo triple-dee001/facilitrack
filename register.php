@@ -49,139 +49,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FaciliTrack — Register as a user">
-    <title>Register | FaciliTrack</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>/assets/css/style.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="FaciliTrack — Register as a user">
+<title>Register | FaciliTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="<?php echo APP_URL; ?>/auth.css">
 </head>
-<body class="auth-body">
-    <div class="auth-container">
-        <div class="auth-card auth-card-wide">
-            <div class="auth-header">
-                <div class="auth-logo">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <h1>Create Account</h1>
-                <p class="auth-subtitle">Join your organization to report and track facility maintenance issues</p>
-            </div>
-            
-            <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i>
-                <ul>
-                    <?php foreach ($errors as $err): ?>
-                        <li><?php echo htmlspecialchars($err); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            <?php endif; ?>
-            
-            <form method="POST" action="" class="auth-form" id="registerForm">
-                <div class="form-group">
-                    <label for="org_code">
-                        <i class="fas fa-key"></i>
-                        Organization Code <span class="required">*</span>
-                    </label>
-                    <input type="text" id="org_code" name="org_code" placeholder="e.g. JUMI-A3B2C1 (provided by your admin)" required
-                           style="text-transform: uppercase;"
-                           value="<?php echo htmlspecialchars($form_data['org_code'] ?? ''); ?>">
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="full_name">
-                            <i class="fas fa-user"></i>
-                            Full Name <span class="required">*</span>
-                        </label>
-                        <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required
-                               value="<?php echo htmlspecialchars($form_data['full_name'] ?? ''); ?>">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">
-                            <i class="fas fa-envelope"></i>
-                            Email Address <span class="required">*</span>
-                        </label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email" required
-                               value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="phone">
-                            <i class="fas fa-phone"></i>
-                            Phone Number <span class="required">*</span>
-                        </label>
-                        <input type="tel" id="phone" name="phone" placeholder="e.g. 08012345678" required
-                               value="<?php echo htmlspecialchars($form_data['phone'] ?? ''); ?>">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="department">
-                            <i class="fas fa-sitemap"></i>
-                            Department / Unit
-                        </label>
-                        <input type="text" id="department" name="department" placeholder="e.g. Sales, Computer Science, Block A"
-                               value="<?php echo htmlspecialchars($form_data['department'] ?? ''); ?>">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Your Location <span class="required">*</span>
-                    </label>
-                    <input type="text" id="location" name="location" placeholder="e.g. Floor 5 Room 503, Block A Room 12, Office 204" required
-                           value="<?php echo htmlspecialchars($form_data['location'] ?? ''); ?>">
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="password">
-                            <i class="fas fa-lock"></i>
-                            Password <span class="required">*</span>
-                        </label>
-                        <div class="password-wrapper">
-                            <input type="password" id="password" name="password" placeholder="Minimum 6 characters" required minlength="6">
-                            <button type="button" class="toggle-password" onclick="togglePassword('password')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="confirm_password">
-                            <i class="fas fa-lock"></i>
-                            Confirm Password <span class="required">*</span>
-                        </label>
-                        <div class="password-wrapper">
-                            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" required>
-                            <button type="button" class="toggle-password" onclick="togglePassword('confirm_password')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-user-plus"></i>
-                    Create Account
-                </button>
-            </form>
-            
-            <div class="auth-footer">
-                <p>Already have an account? <a href="index.php">Login here</a></p>
-                <p class="mt-1">New organization? <a href="register-organization.php">Register your facility</a></p>
-            </div>
-        </div>
+<body>
+<div class="auth-wrap">
+
+  <!-- LEFT — FORM -->
+  <div class="auth-left">
+    <a href="index.php" class="auth-brand">
+      <div class="auth-brand-icon"><i class="fas fa-tools"></i></div>
+      <span class="auth-brand-name">FaciliTrack</span>
+    </a>
+
+    <h1 class="auth-heading">Create Account</h1>
+    <p class="auth-sub">Join your organization to report and track facility maintenance issues. You'll need the code provided by your admin.</p>
+
+    <?php if (!empty($errors)): ?>
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-circle"></i>
+      <ul><?php foreach ($errors as $err): ?><li><?php echo htmlspecialchars($err); ?></li><?php endforeach; ?></ul>
     </div>
-    
-    <script src="<?php echo APP_URL; ?>/assets/js/app.js"></script>
+    <?php endif; ?>
+
+    <form method="POST" action="" id="registerForm">
+      <div class="f-section"><i class="fas fa-key"></i> Organization</div>
+      <div class="fg">
+        <label>Organization Code <span class="req">*</span></label>
+        <input type="text" id="org_code" name="org_code" placeholder="e.g. JUMI-A3B2C1 (from your admin)" required style="text-transform:uppercase" value="<?php echo htmlspecialchars($form_data['org_code'] ?? ''); ?>">
+      </div>
+
+      <div class="f-section"><i class="fas fa-user"></i> Personal Details</div>
+      <div class="f-row">
+        <div class="fg">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="full_name" name="full_name" placeholder="Your full name" required value="<?php echo htmlspecialchars($form_data['full_name'] ?? ''); ?>">
+        </div>
+        <div class="fg">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>">
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="fg">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="08012345678" required value="<?php echo htmlspecialchars($form_data['phone'] ?? ''); ?>">
+        </div>
+        <div class="fg">
+          <label>Department / Unit</label>
+          <input type="text" id="department" name="department" placeholder="e.g. Sales, Block A" value="<?php echo htmlspecialchars($form_data['department'] ?? ''); ?>">
+        </div>
+      </div>
+      <div class="fg">
+        <label>Your Location <span class="req">*</span></label>
+        <input type="text" id="location" name="location" placeholder="e.g. Floor 5 Room 503, Office 204" required value="<?php echo htmlspecialchars($form_data['location'] ?? ''); ?>">
+      </div>
+
+      <div class="f-section"><i class="fas fa-lock"></i> Security</div>
+      <div class="f-row">
+        <div class="fg">
+          <label>Password <span class="req">*</span></label>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password" placeholder="Min. 6 characters" required minlength="6">
+            <button type="button" class="pw-eye" onclick="togglePw('password')"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Confirm Password <span class="req">*</span></label>
+          <div class="pw-wrap">
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required>
+            <button type="button" class="pw-eye" onclick="togglePw('confirm_password')"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit"><i class="fas fa-user-plus"></i> Create Account</button>
+    </form>
+
+    <div class="auth-links">
+      Already have an account? <a href="index.php">Sign in</a><br>
+      New organization? <a href="register-organization.php">Register your facility</a>
+    </div>
+  </div>
+
+  <!-- RIGHT — PREVIEW -->
+  <div class="auth-right">
+    <div class="preview-card">
+      <img src="<?php echo APP_URL; ?>/assets/images/preview-dashboard.png" alt="FaciliTrack Dashboard Preview">
+      <div class="preview-label">Your Dashboard After Signing In</div>
+    </div>
+  </div>
+
+</div>
+<script>
+function togglePw(id){var i=document.getElementById(id);i.type=i.type==='password'?'text':'password'}
+</script>
 </body>
 </html>
+

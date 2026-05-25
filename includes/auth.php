@@ -12,7 +12,7 @@ require_once __DIR__ . '/../config/database.php';
 /**
  * Register a new organization and its admin
  */
-function register_organization($org_name, $org_type, $org_address, $admin_name, $admin_email, $admin_password, $admin_phone) {
+function register_organization($org_name, $org_type, $org_address, $org_size, $admin_name, $admin_email, $admin_password, $admin_phone) {
     $db = getDBConnection();
     
     // Check if email exists
@@ -40,8 +40,8 @@ function register_organization($org_name, $org_type, $org_address, $admin_name, 
         $db->beginTransaction();
         
         // Create organization
-        $stmt = $db->prepare("INSERT INTO organizations (name, type, address, org_code) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$org_name, $org_type, $org_address, $org_code]);
+        $stmt = $db->prepare("INSERT INTO organizations (name, type, address, org_size, org_code) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$org_name, $org_type, $org_address, $org_size, $org_code]);
         $org_id = $db->lastInsertId();
         
         // Create admin user (auto-approved)
@@ -125,7 +125,7 @@ function admin_add_user($full_name, $email, $password, $phone, $department, $loc
 function login_user($email, $password) {
     $db = getDBConnection();
     
-    $stmt = $db->prepare("SELECT u.*, o.name as org_name, o.org_code 
+    $stmt = $db->prepare("SELECT u.*, o.name as org_name, o.org_code, o.logo_path 
                            FROM users u 
                            JOIN organizations o ON u.organization_id = o.id 
                            WHERE u.email = ? AND u.is_active = 1 AND o.is_active = 1");
@@ -149,6 +149,8 @@ function login_user($email, $password) {
     $_SESSION['organization_id'] = $user['organization_id'];
     $_SESSION['org_name'] = $user['org_name'];
     $_SESSION['org_code'] = $user['org_code'];
+    $_SESSION['profile_image'] = $user['profile_image'];
+    $_SESSION['logo_path'] = $user['logo_path'];
     
     return ['success' => true, 'message' => 'Login successful.', 'role' => $user['role']];
 }
@@ -172,7 +174,9 @@ function current_user() {
         'role' => $_SESSION['user_role'],
         'organization_id' => $_SESSION['organization_id'],
         'org_name' => $_SESSION['org_name'],
-        'org_code' => $_SESSION['org_code']
+        'org_code' => $_SESSION['org_code'],
+        'profile_image' => $_SESSION['profile_image'] ?? null,
+        'logo_path' => $_SESSION['logo_path'] ?? null
     ];
 }
 
@@ -200,6 +204,8 @@ function require_role($allowed_roles) {
             header('Location: ' . APP_URL . '/tenant/dashboard.php');
         } elseif ($role === 'technician') {
             header('Location: ' . APP_URL . '/technician/dashboard.php');
+        } elseif ($role === 'superadmin') {
+            header('Location: ' . APP_URL . '/superadmin/dashboard.php');
         } else {
             header('Location: ' . APP_URL . '/admin/dashboard.php');
         }

@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS organizations (
     name VARCHAR(200) NOT NULL,
     type ENUM('office', 'campus', 'residential', 'school', 'hospital', 'other') NOT NULL DEFAULT 'other',
     address TEXT,
+    org_size ENUM('1-10', '11-100', '101-250', '251-1000', '1000+') DEFAULT '1-10',
+    logo_path VARCHAR(255) DEFAULT NULL,
     org_code VARCHAR(20) NOT NULL UNIQUE,
     created_by INT DEFAULT NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
@@ -33,7 +35,8 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(20),
     department VARCHAR(100),
     location VARCHAR(200),
-    role ENUM('user', 'technician', 'manager', 'admin') NOT NULL DEFAULT 'user',
+    profile_image VARCHAR(255) DEFAULT NULL,
+    role ENUM('user', 'technician', 'manager', 'admin', 'superadmin') NOT NULL DEFAULT 'user',
     is_approved TINYINT(1) NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -79,6 +82,20 @@ CREATE TABLE IF NOT EXISTS request_updates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (request_id) REFERENCES maintenance_requests(id) ON DELETE CASCADE,
     FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ============================================================
+-- Activity Log Table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS activity_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL,
+    user_id INT,
+    old_status VARCHAR(50),
+    new_status VARCHAR(50) NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (request_id) REFERENCES maintenance_requests(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================

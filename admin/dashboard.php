@@ -23,15 +23,21 @@ $stmt = $db->prepare("SELECT
 $stmt->execute([$org_id]);
 $counts = $stmt->fetch();
 
-// User count in this org
-$stmt = $db->prepare("SELECT COUNT(*) as total FROM users WHERE organization_id = ? AND role = 'user'");
+// Staff counts by role
+$stmt = $db->prepare("SELECT 
+    COUNT(*) as total_staff,
+    SUM(CASE WHEN role = 'user' THEN 1 ELSE 0 END) as users,
+    SUM(CASE WHEN role = 'technician' THEN 1 ELSE 0 END) as technicians,
+    SUM(CASE WHEN role = 'manager' THEN 1 ELSE 0 END) as managers,
+    SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) as admins
+    FROM users WHERE organization_id = ? AND is_approved = 1");
 $stmt->execute([$org_id]);
-$user_count = $stmt->fetch()['total'];
-
-// Technician count in this org
-$stmt = $db->prepare("SELECT COUNT(*) as total FROM users WHERE organization_id = ? AND role = 'technician'");
-$stmt->execute([$org_id]);
-$tech_count = $stmt->fetch()['total'];
+$staff = $stmt->fetch();
+$total_staff = $staff['total_staff'];
+$user_count = $staff['users'];
+$tech_count = $staff['technicians'];
+$manager_count = $staff['managers'];
+$admin_count = $staff['admins'];
 
 // Pending approval count
 $stmt = $db->prepare("SELECT COUNT(*) as total FROM users WHERE organization_id = ? AND is_approved = 0");
@@ -113,8 +119,46 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="stat-card stat-users">
         <div class="stat-icon"><i class="fas fa-users"></i></div>
         <div class="stat-info">
-            <h3><?php echo $user_count; ?> / <?php echo $tech_count; ?></h3>
-            <p>Users / Technicians</p>
+            <h3><?php echo $total_staff; ?></h3>
+            <p>Total Staff</p>
+        </div>
+    </div>
+</div>
+
+<!-- Staff Breakdown -->
+<div class="section-header">
+    <h2><i class="fas fa-user-friends"></i> Staff Overview</h2>
+    <?php if ($user['role'] === 'admin'): ?>
+    <a href="users.php" class="btn btn-outline btn-sm">Manage Users</a>
+    <?php endif; ?>
+</div>
+<div class="stat-cards" style="margin-bottom:28px">
+    <div class="stat-card stat-total">
+        <div class="stat-icon"><i class="fas fa-user"></i></div>
+        <div class="stat-info">
+            <h3><?php echo $user_count; ?></h3>
+            <p>Tenants / Users</p>
+        </div>
+    </div>
+    <div class="stat-card stat-pending">
+        <div class="stat-icon"><i class="fas fa-hard-hat"></i></div>
+        <div class="stat-info">
+            <h3><?php echo $tech_count; ?></h3>
+            <p>Technicians</p>
+        </div>
+    </div>
+    <div class="stat-card stat-progress">
+        <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+        <div class="stat-info">
+            <h3><?php echo $manager_count; ?></h3>
+            <p>Managers</p>
+        </div>
+    </div>
+    <div class="stat-card stat-resolved">
+        <div class="stat-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="stat-info">
+            <h3><?php echo $admin_count; ?></h3>
+            <p>Admins</p>
         </div>
     </div>
 </div>
